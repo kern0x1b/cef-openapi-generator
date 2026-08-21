@@ -190,7 +190,7 @@ All [standard OpenAPI Generator Gradle plugin properties](https://github.com/Ope
                 <dependency>
                     <groupId>io.github.cef</groupId>
                     <artifactId>generator</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.1.2</version>
                 </dependency>
             </dependencies>
         </plugin>
@@ -445,6 +445,12 @@ java -cp generator.jar org.openapitools.codegen.OpenAPIGenerator config-help -g 
 ```
 
 See [TESTING.md](docs/TESTING.md) for details.
+
+## Contributing
+
+See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md). Please report security issues
+per [docs/SECURITY.md](docs/SECURITY.md) rather than as a public issue. This
+project follows a [Code of Conduct](docs/CODE_OF_CONDUCT.md).
 
 ## Version
 

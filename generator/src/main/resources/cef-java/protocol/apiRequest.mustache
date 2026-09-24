@@ -224,9 +224,12 @@ public final class ApiRequest {
         try {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             for (CefPostDataElement element : elements) {
-                // CEF API requires pre-allocated buffer
-                byte[] buffer = new byte[65536]; // 64KB buffer
-                int bytesRead = element.getBytes(buffer.length, buffer);
+                int size = element.getBytesCount();
+                if (size <= 0) {
+                    continue;
+                }
+                byte[] buffer = new byte[size];
+                int bytesRead = element.getBytes(size, buffer);
                 if (bytesRead > 0) {
                     output.write(buffer, 0, bytesRead);
                 }

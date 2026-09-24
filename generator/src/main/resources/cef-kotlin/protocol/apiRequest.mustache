@@ -103,8 +103,10 @@ class ApiRequest(
         return runCatching {
             ByteArrayOutputStream().use { output ->
                 elements.forEach { element ->
-                    val buffer = ByteArray(65536)
-                    val bytesRead = element.getBytes(buffer.size, buffer)
+                    val size = element.bytesCount
+                    if (size <= 0) return@forEach
+                    val buffer = ByteArray(size)
+                    val bytesRead = element.getBytes(size, buffer)
                     if (bytesRead > 0) output.write(buffer, 0, bytesRead)
                 }
                 output.toString(Charsets.UTF_8)

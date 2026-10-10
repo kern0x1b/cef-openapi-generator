@@ -3,6 +3,9 @@ package {{apiPackage}}.cef
 import {{apiPackage}}.protocol.ApiResponse
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.cef.callback.CefCallback
+{{#resourceReadCallback}}
+import org.cef.callback.CefResourceReadCallback
+{{/resourceReadCallback}}
 import org.cef.handler.CefResourceHandlerAdapter
 import org.cef.misc.IntRef
 import org.cef.misc.StringRef
@@ -133,6 +136,16 @@ internal class ApiResponseHandler private constructor(
     }
 
     override fun readResponse(buffer: ByteArray, bytesToRead: Int, bytesRead: IntRef, callback: CefCallback): Boolean {
+        return copyChunk(buffer, bytesToRead, bytesRead)
+    }
+{{#resourceReadCallback}}
+
+    override fun read(buffer: ByteArray, bytesToRead: Int, bytesRead: IntRef, callback: CefResourceReadCallback): Boolean {
+        return copyChunk(buffer, bytesToRead, bytesRead)
+    }
+{{/resourceReadCallback}}
+
+    private fun copyChunk(buffer: ByteArray, bytesToRead: Int, bytesRead: IntRef): Boolean {
         val toRead = min(bytesToRead, data.remaining())
         data.get(buffer, 0, toRead)
         bytesRead.set(toRead)

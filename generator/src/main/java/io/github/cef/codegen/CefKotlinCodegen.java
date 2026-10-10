@@ -1,6 +1,7 @@
 package io.github.cef.codegen;
 
 import io.swagger.v3.oas.models.media.Schema;
+import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.SupportingFile;
@@ -18,6 +19,7 @@ import io.github.cef.codegen.processing.TypeConverter;
 
 import static io.github.cef.codegen.config.FileSpec.API_SERVICE;
 import static io.github.cef.codegen.processing.EnumFieldProcessor.ENUM_FIELDS_KEY;
+import static org.openapitools.codegen.CliOption.newBoolean;
 
 /**
  * Kotlin code generator for CEF OpenAPI specifications.
@@ -42,11 +44,21 @@ public class CefKotlinCodegen extends CefCodegen {
     private static final String BACKTICK = "`";
     private static final String MOCK_SERVICE_FILTER = "mockService";
 
+    static final String OPT_RESOURCE_READ_CALLBACK = "resourceReadCallback";
+
     public CefKotlinCodegen() {
         super();
         embeddedTemplateDir = templateDir = TEMPLATE_DIR;
         sourceFolder = KOTLIN_SOURCE_FOLDER;
         configureKotlinTypes();
+        cliOptions.add(resourceReadCallbackOption());
+    }
+
+    private static CliOption resourceReadCallbackOption() {
+        return newBoolean(OPT_RESOURCE_READ_CALLBACK,
+            "Also implement CefResourceHandler.read with a CefResourceReadCallback, which JCEF from CEF 144 "
+                + "(IntelliJ 2026.2) adds. readResponse is always implemented, because JCEF still calls it",
+            false);
     }
 
     @Override
@@ -107,6 +119,7 @@ public class CefKotlinCodegen extends CefCodegen {
     @Override
     public void processOpts() {
         super.processOpts();
+        applyResourceReadCallback();
 
         modelTemplateFiles.clear();
         modelTemplateFiles.put(MODEL_TEMPLATE, KOTLIN_EXT);
@@ -127,6 +140,12 @@ public class CefKotlinCodegen extends CefCodegen {
         apiTestTemplateFiles.put(API_TEST_TEMPLATE, KOTLIN_EXT);
 
         convertSupportingFilesToKotlin();
+    }
+
+    private void applyResourceReadCallback() {
+        var enabled = Boolean.parseBoolean(String.valueOf(
+            additionalProperties.getOrDefault(OPT_RESOURCE_READ_CALLBACK, false)));
+        additionalProperties.put(OPT_RESOURCE_READ_CALLBACK, enabled);
     }
 
     private void convertSupportingFilesToKotlin() {

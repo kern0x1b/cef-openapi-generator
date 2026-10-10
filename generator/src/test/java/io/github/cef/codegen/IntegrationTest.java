@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class IntegrationTest {
 
     private static final String SPEC = "src/test/resources/test-openapi.yaml";
+    private static final String RESPONSE_HANDLER_KT = "src/main/kotlin/com/example/api/cef/ApiResponseHandler.kt";
 
     @Nested
     class JavaGenerator {
@@ -260,6 +261,33 @@ class IntegrationTest {
             // Default dateLibrary=java8: OffsetDateTime for date-time
             // Our test spec doesn't have date fields, but verify no crash
             assertFileExists(outputDir.resolve("src/main/kotlin"), "com/example/api/dto/User.kt");
+        }
+
+        @Test
+        void resourceReadCallbackDefaultsToReadResponseOnly(@TempDir Path outputDir) {
+            generate("cef-kotlin", outputDir);
+            var content = readFile(outputDir.resolve(RESPONSE_HANDLER_KT));
+            assertTrue(content.contains("override fun readResponse("), "readResponse should always be implemented");
+            assertFalse(content.contains("override fun read("), "Default should not implement read");
+            assertFalse(content.contains("CefResourceReadCallback"), "Default should not import the read callback");
+        }
+
+        @Test
+        void resourceReadCallbackAddsReadBesideReadResponse(@TempDir Path outputDir) {
+            generateWith("cef-kotlin", outputDir, Map.of("resourceReadCallback", "true"));
+            var content = readFile(outputDir.resolve(RESPONSE_HANDLER_KT));
+            assertTrue(content.contains("override fun read(buffer: ByteArray, bytesToRead: Int, bytesRead: IntRef, "
+                + "callback: CefResourceReadCallback): Boolean"), "read should take the CEF read callback");
+            assertTrue(content.contains("import org.cef.callback.CefResourceReadCallback"), "read callback should be imported");
+            assertTrue(content.contains("override fun readResponse("), "readResponse should stay, JCEF still calls it");
+        }
+
+        @Test
+        void resourceReadCallbackFalseLeavesReadOut(@TempDir Path outputDir) {
+            generateWith("cef-kotlin", outputDir, Map.of("resourceReadCallback", "false"));
+            var content = readFile(outputDir.resolve(RESPONSE_HANDLER_KT));
+            assertFalse(content.contains("override fun read("), "false should not implement read");
+            assertTrue(content.contains("override fun readResponse("), "readResponse should stay");
         }
     }
 

@@ -209,6 +209,29 @@ class CefKotlinCodegenTest {
         }
     }
 
+    @Nested
+    class ResourceReadCallbackOption {
+
+        @Test void isDeclaredForConfigHelpAsOffByDefault() {
+            var option = codegen.cliOptions().stream()
+                .filter(o -> "resourceReadCallback".equals(o.getOpt()))
+                .findFirst();
+            assertTrue(option.isPresent(), "resourceReadCallback should be a documented option");
+            assertEquals("false", option.get().getDefault());
+        }
+
+        @Test void stringTrueBecomesABooleanForTheTemplate() {
+            var configured = new CefKotlinCodegen();
+            configured.additionalProperties().put("resourceReadCallback", "true");
+            configured.processOpts();
+            assertEquals(Boolean.TRUE, configured.additionalProperties().get("resourceReadCallback"));
+        }
+
+        @Test void absentOptionIsFalseForTheTemplate() {
+            assertEquals(Boolean.FALSE, codegen.additionalProperties().get("resourceReadCallback"));
+        }
+    }
+
     private org.openapitools.codegen.model.ModelsMap wrapModel(CodegenModel model) {
         var modelsMap = new org.openapitools.codegen.model.ModelsMap();
         var modelMap = new org.openapitools.codegen.model.ModelMap();

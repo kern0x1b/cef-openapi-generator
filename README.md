@@ -51,7 +51,7 @@ repositories {
 ```kotlin
 buildscript {
     repositories { mavenLocal() }
-    dependencies { classpath("io.github.cef:generator:3.1.2") }
+    dependencies { classpath("io.github.cef:generator:3.2.0") }
 }
 
 plugins {
@@ -135,6 +135,7 @@ tasks.compileKotlin { dependsOn(generateApi) }
 | `dateLibrary` | `java8` | Date library: `java8` (OffsetDateTime), `java8-localdatetime` (LocalDateTime) |
 | `openApiNullable` | `false` | Enable Jackson Nullable (`JsonNullable<T>`) — disabled for clean DTOs |
 | `useBeanValidation` | `false` | Add Jakarta Bean Validation annotations — disabled for zero-dep output |
+| `resourceReadCallback` | `false` | Kotlin only. Also implement `CefResourceHandler.read` with a `CefResourceReadCallback`, which JCEF from CEF 144 (IntelliJ 2026.2) adds. `readResponse` is always implemented, because JCEF still calls it |
 
 > All standard [AbstractJavaCodegen options](https://openapi-generator.tech/docs/generators/java/) are inherited
 > (e.g., `serializationLibrary`, `sourceFolder`, `sortModelPropertiesByRequiredFlag`, `enumPropertyNaming`, etc.)
@@ -190,7 +191,7 @@ All [standard OpenAPI Generator Gradle plugin properties](https://github.com/Ope
                 <dependency>
                     <groupId>io.github.cef</groupId>
                     <artifactId>generator</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.0</version>
                 </dependency>
             </dependencies>
         </plugin>
@@ -215,7 +216,7 @@ java -cp generator.jar org.openapitools.codegen.OpenAPIGenerator generate \
 
 # Or use the openapi-generator-cli with custom JAR
 openapi-generator-cli generate \
-  --custom-generator=generator-3.1.0.jar \
+  --custom-generator=generator-3.2.0.jar \
   -g cef-kotlin \
   -i openapi.yaml \
   -o ./generated
@@ -454,7 +455,7 @@ project follows a [Code of Conduct](docs/CODE_OF_CONDUCT.md).
 
 ## Version
 
-**Current: 3.1.2** — [CHANGELOG.md](CHANGELOG.md)
+**Current: 3.2.0** — [CHANGELOG.md](CHANGELOG.md)
 
 Upgrading? See [MIGRATION.md](docs/MIGRATION.md).
 

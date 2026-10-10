@@ -11,6 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-10-10
+
+### Added
+- **`resourceReadCallback` configOption (cef-kotlin, default `false`).** `true` makes the generated `ApiResponseHandler`
+  also implement `CefResourceHandler.read(byte[], int, IntRef, CefResourceReadCallback)`, which JCEF from CEF 144
+  (IntelliJ 2026.2) adds. `readResponse` stays implemented in every case: JCEF 144 still calls it, and it is the only
+  read method older JCEF versions have. Both methods copy the same bytes through one private helper.
+  The default output keeps the behaviour of 3.1.x; the file is laid out with the shared helper, so a regenerated
+  `ApiResponseHandler.kt` differs in text but not in behaviour.
+
+## [3.1.3] - 2026-09-24
+
+### Fixed (both cef-java and cef-kotlin targets)
+- **A request body is read into a buffer sized by the body instead of a fixed 64 KB.** `ApiRequest` allocated 65536
+  bytes per post-data element and read at most that much, so a larger body was cut off silently. It now asks
+  `CefPostDataElement.getBytesCount()` and allocates exactly that, skipping empty elements.
+
 ## [3.1.2] - 2026-07-17
 
 ### Fixed (both cef-java and cef-kotlin targets)
